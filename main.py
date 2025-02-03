@@ -1,7 +1,6 @@
 import geopandas as gpd
 import pandas as pd
 import numpy as np
-import scipy.stats as stats
 import matplotlib.pyplot as plt
 import streamlit as st
 
@@ -42,38 +41,38 @@ def estadisticas_vegetacion(df):
     stats_df = pd.DataFrame({'Mínimo': min_values, 'Máximo': max_values})
     st.write(stats_df)
 
-def mapa_por_vegetación():
-    st.title('Mapa por vegetacion')
-    fig = df.plot(ax=base, column="Tipo_Vegetacion", cmap="Set2", legend=True, marker='o', markersize=10)
+def mapa_por_vegetación(df, base):
+    st.title('Mapa por vegetación')
+    fig, ax = plt.subplots(1, 1, figsize=(10, 6))
+    base.plot(ax=ax, color='white', edgecolor='black')
+    df.plot(ax=ax, column="Tipo_Vegetacion", cmap="Set2", legend=True, marker='o', markersize=10)
     st.pyplot(fig)
 
-def mapa_por_altitud():
+def mapa_por_altitud(df, base):
     st.title('Mapa por altitud')
-    fig = df.plot(ax=base, column="Altitud", cmap="coolwarm", legend=True, marker='o', markersize=10)
+    fig, ax = plt.subplots(1, 1, figsize=(10, 6))
+    base.plot(ax=ax, color='white', edgecolor='black')
+    df.plot(ax=ax, column="Altitud", cmap="coolwarm", legend=True, marker='o', markersize=10)
     st.pyplot(fig)
 
-def mapa_por_precipitacion():
+def mapa_por_precipitacion(df, base):
     st.title('Mapa por precipitacion')
-    fig = df.plot(ax=base, column="Precipitacion", cmap="coolwarm", legend=True, marker='o', markersize=10)
+    fig, ax = plt.subplots(1, 1, figsize=(10, 6))
+    base.plot(ax=ax, color='white', edgecolor='black')
+    df.plot(ax=ax, column="Precipitacion", cmap="coolwarm", legend=True, marker='o', markersize=10)
     st.pyplot(fig)
 
 def interaccion_usuario(df):
     ruta_mapa = "https://naturalearth.s3.amazonaws.com/50m_cultural/ne_50m_admin_0_countries.zip"
     mundo_dataframe = gpd.read_file(ruta_mapa)
     
-    # Crear figura con 3 subgráficos (1 fila, 3 columnas)
-
     # Filtrar base del mapa para South America
-    global base
     base = mundo_dataframe[mundo_dataframe['CONTINENT'] == 'South America']
-    base = base.plot(color='white', edgecolor='black')
-
-    # Mapas por vegetación, altitud y precipitaciones
-    mapa_por_vegetación()
-    mapa_por_altitud()
-    mapa_por_precipitacion()
-
-    # Ajustar el espacio entre subgráficos
+    
+    # Llamar a los métodos de los mapas
+    mapa_por_vegetación(df, base)
+    mapa_por_altitud(df, base)
+    mapa_por_precipitacion(df, base)
 
 def main():
     # Título de la app
