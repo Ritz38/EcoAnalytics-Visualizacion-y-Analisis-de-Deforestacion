@@ -70,6 +70,10 @@ def mapa_personalizado(df, base):
     variables_disponibles = df.columns.tolist()
     selected_variables = st.multiselect("Selecciona hasta 4 variables", variables_disponibles, max_selections=4)
     
+    if not selected_variables:
+        st.warning("Por favor, selecciona al menos una variable para continuar.")
+        return  # Si no se selecciona ninguna variable, no continuamos con el procesamiento
+    
     # Filtrar las columnas que contienen texto o fechas
     columnas_texto = df[selected_variables].select_dtypes(include=['object']).columns.tolist()
     columnas_fecha = df[selected_variables].select_dtypes(include=['datetime']).columns.tolist()
@@ -100,6 +104,7 @@ def mapa_personalizado(df, base):
     base.plot(ax=ax, color='white', edgecolor='black')
     filtered_df.plot(ax=ax, column=selected_variables[0], cmap="coolwarm", legend=True, marker='o', markersize=10)
     st.pyplot(fig)
+
 
 
 def analisis_cluster(df):
