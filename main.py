@@ -43,12 +43,15 @@ def estadisticas_vegetacion(df):
     st.write(stats_df)
 
 def mapa_por_vegetación(ax):
+    st.title('Mapa por vegetacion')
     df.plot(ax=ax, column="Tipo_Vegetacion", cmap="Set2", legend=True, marker='o', markersize=10)
 
 def mapa_por_altitud(ax):
+    st.title('Mapa por vegetacion')
     df.plot(ax=ax, column="Altitud", cmap="coolwarm", legend=True, marker='o', markersize=10)
 
 def mapa_por_precipitacion(ax):
+    st.title('Mapa por vegetacion')
     df.plot(ax=ax, column="Precipitacion", cmap="coolwarm", legend=True, marker='o', markersize=10)
 
 def interaccion_usuario(df):
