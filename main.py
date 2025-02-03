@@ -62,7 +62,7 @@ def interaccion_usuario(df):
 
     # Filtrar base del mapa para South America
     base = mundo_dataframe[mundo_dataframe['CONTINENT'] == 'South America']
-    base = base.plot(olor='white', edgecolor='black')
+    base = base.plot(color='white', edgecolor='black')
 
     # Mapas por vegetación, altitud y precipitaciones
     mapa_por_vegetación()
