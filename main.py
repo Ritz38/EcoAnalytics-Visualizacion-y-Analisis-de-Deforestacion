@@ -42,35 +42,32 @@ def estadisticas_vegetacion(df):
     stats_df = pd.DataFrame({'Mínimo': min_values, 'Máximo': max_values})
     st.write(stats_df)
 
-def mapa_por_vegetación(ax):
+def mapa_por_vegetación():
     st.title('Mapa por vegetacion')
-    df.plot(ax=ax, column="Tipo_Vegetacion", cmap="Set2", legend=True, marker='o', markersize=10)
+    df.plot(ax=base, column="Tipo_Vegetacion", cmap="Set2", legend=True, marker='o', markersize=10)
 
-def mapa_por_altitud(ax):
-    st.title('Mapa por vegetacion')
-    df.plot(ax=ax, column="Altitud", cmap="coolwarm", legend=True, marker='o', markersize=10)
+def mapa_por_altitud():
+    st.title('Mapa por altitud')
+    df.plot(ax=base, column="Altitud", cmap="coolwarm", legend=True, marker='o', markersize=10)
 
-def mapa_por_precipitacion(ax):
-    st.title('Mapa por vegetacion')
-    df.plot(ax=ax, column="Precipitacion", cmap="coolwarm", legend=True, marker='o', markersize=10)
+def mapa_por_precipitacion():
+    st.title('Mapa por precipitacion')
+    df.plot(ax=base, column="Precipitacion", cmap="coolwarm", legend=True, marker='o', markersize=10)
 
 def interaccion_usuario(df):
     ruta_mapa = "https://naturalearth.s3.amazonaws.com/50m_cultural/ne_50m_admin_0_countries.zip"
     mundo_dataframe = gpd.read_file(ruta_mapa)
     
     # Crear figura con 3 subgráficos (1 fila, 3 columnas)
-    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
 
     # Filtrar base del mapa para South America
     base = mundo_dataframe[mundo_dataframe['CONTINENT'] == 'South America']
-    base.plot(ax=axes[0], color='white', edgecolor='black')
-    base.plot(ax=axes[1], color='white', edgecolor='black')
-    base.plot(ax=axes[2], color='white', edgecolor='black')
+    base = base.plot(olor='white', edgecolor='black')
 
     # Mapas por vegetación, altitud y precipitaciones
-    mapa_por_vegetación(axes[0])
-    mapa_por_altitud(axes[1])
-    mapa_por_precipitacion(axes[2])
+    mapa_por_vegetación()
+    mapa_por_altitud()
+    mapa_por_precipitacion()
 
     # Ajustar el espacio entre subgráficos
     st.pyplot(fig)
