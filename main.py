@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 
 def interpolar(df):
     df = df.interpolate(method="linear")
@@ -41,25 +42,73 @@ def estadisticas_vegetacion(df):
     stats_df = pd.DataFrame({'Mínimo': min_values, 'Máximo': max_values})
     st.write(stats_df)
 
-def mapa_por_vegetación(df, base):
-    st.title('Mapa por vegetación')
+def mapa_personalizado(df, base):
+    st.title('Mapa Personalizado por Variables Seleccionadas')
+    
+    # Recibir las variables y rangos de filtrado
+    variable_1 = st.selectbox("Selecciona la primera variable", df.columns)
+    min_1, max_1 = st.slider(f"Selecciona el rango para {variable_1}", float(df[variable_1].min()), float(df[variable_1].max()), (float(df[variable_1].min()), float(df[variable_1].max())))
+    
+    variable_2 = st.selectbox("Selecciona la segunda variable", df.columns)
+    min_2, max_2 = st.slider(f"Selecciona el rango para {variable_2}", float(df[variable_2].min()), float(df[variable_2].max()), (float(df[variable_2].min()), float(df[variable_2].max())))
+    
+    filtered_df = df[(df[variable_1] >= min_1) & (df[variable_1] <= max_1) & (df[variable_2] >= min_2) & (df[variable_2] <= max_2)]
+    
+    # Crear el gráfico con los datos filtrados
     fig, ax = plt.subplots(1, 1, figsize=(10, 6))
     base.plot(ax=ax, color='white', edgecolor='black')
-    df.plot(ax=ax, column="Tipo_Vegetacion", cmap="Set2", legend=True, marker='o', markersize=10)
+    filtered_df.plot(ax=ax, column=variable_1, cmap="coolwarm", legend=True, marker='o', markersize=10)
     st.pyplot(fig)
 
-def mapa_por_altitud(df, base):
-    st.title('Mapa por altitud')
+def analisis_cluster(df):
+    st.title('Análisis de Clúster de Superficies Deforestadas')
+    
+    # Selección de variables para el análisis de clúster
+    variables = ['Superficie_Deforestada', 'Tasa_Deforestacion', 'Altitud', 'Precipitacion']
+    selected_variables = st.multiselect('Selecciona las variables para el análisis de clúster', variables, default=variables[:2])
+    
+    # Estándarización de las variables seleccionadas
+    data = df[selected_variables].dropna()
+    
+    # Normalizar los datos (usamos los rangos de las variables)
+    data_scaled = (data - data.min()) / (data.max() - data.min())
+    
+    # Aplicar linkage (agregación jerárquica de clústeres)
+    linked = linkage(data_scaled, method='ward')
+    
+    # Mostrar dendrograma
+    st.write("Dendrograma de los clústeres:")
+    fig, ax = plt.subplots(figsize=(10, 7))
+    dendrogram(linked, labels=data.index, ax=ax)
+    st.pyplot(fig)
+    
+    # Generar clústeres con un umbral
+    threshold = st.slider('Selecciona el umbral para los clústeres', min_value=0, max_value=200, value=100)
+    clusters = fcluster(linked, t=threshold, criterion='distance')
+    
+    # Añadir los clústeres al dataframe
+    df['Cluster'] = clusters
+    
+    # Mostrar los resultados del clúster
+    st.write(f"Clústeres creados con las variables: {', '.join(selected_variables)}")
+    st.write(df[['Cluster'] + selected_variables].head())
+    
+    # Mostrar un gráfico de dispersión de los clústeres
     fig, ax = plt.subplots(1, 1, figsize=(10, 6))
-    base.plot(ax=ax, color='white', edgecolor='black')
-    df.plot(ax=ax, column="Altitud", cmap="coolwarm", legend=True, marker='o', markersize=10)
+    scatter = ax.scatter(df[selected_variables[0]], df[selected_variables[1]], c=df['Cluster'], cmap='viridis')
+    ax.set_xlabel(selected_variables[0])
+    ax.set_ylabel(selected_variables[1])
+    fig.colorbar(scatter)
     st.pyplot(fig)
 
-def mapa_por_precipitacion(df, base):
-    st.title('Mapa por precipitacion')
-    fig, ax = plt.subplots(1, 1, figsize=(10, 6))
-    base.plot(ax=ax, color='white', edgecolor='black')
-    df.plot(ax=ax, column="Precipitacion", cmap="coolwarm", legend=True, marker='o', markersize=10)
+def grafico_torta(df):
+    st.title('Gráfico de Torta por Tipo de Vegetación')
+    
+    # Crear un gráfico de torta para mostrar la distribución por tipo de vegetación
+    vegetation_count = df['Tipo_Vegetacion'].value_counts()
+    fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+    ax.pie(vegetation_count, labels=vegetation_count.index, autopct='%1.1f%%', startangle=90, colors=plt.cm.Paired.colors)
+    ax.axis('equal')  # Asegura que el gráfico sea un círculo
     st.pyplot(fig)
 
 def interaccion_usuario(df):
@@ -69,10 +118,10 @@ def interaccion_usuario(df):
     # Filtrar base del mapa para South America
     base = mundo_dataframe[mundo_dataframe['CONTINENT'] == 'South America']
     
-    # Llamar a los métodos de los mapas
-    mapa_por_vegetación(df, base)
-    mapa_por_altitud(df, base)
-    mapa_por_precipitacion(df, base)
+    # Llamar a las funciones de mapas y análisis
+    mapa_personalizado(df, base)
+    analisis_cluster(df)
+    grafico_torta(df)
 
 def main():
     # Título de la app
