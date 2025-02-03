@@ -61,6 +61,7 @@ def interaccion_usuario(df):
     # Crear figura con 3 subgráficos (1 fila, 3 columnas)
 
     # Filtrar base del mapa para South America
+    global base
     base = mundo_dataframe[mundo_dataframe['CONTINENT'] == 'South America']
     base = base.plot(color='white', edgecolor='black')
 
