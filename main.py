@@ -78,7 +78,7 @@ def main():
 
     # Subir archivo o pegar link
     option = st.selectbox('Selecciona cómo quieres cargar los datos', ['Subir archivo', 'Pegar enlace'])
-
+    global df
     df = None
     
     if option == 'Subir archivo':
