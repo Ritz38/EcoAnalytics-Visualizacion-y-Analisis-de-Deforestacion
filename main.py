@@ -70,8 +70,9 @@ def mapa_personalizado(df, base):
     variables_disponibles = df.columns.tolist()
     selected_variables = st.multiselect("Selecciona hasta 4 variables", variables_disponibles, max_selections=4)
     
-    # Filtrar las columnas que contienen texto
+    # Filtrar las columnas que contienen texto o fechas
     columnas_texto = df[selected_variables].select_dtypes(include=['object']).columns.tolist()
+    columnas_fecha = df[selected_variables].select_dtypes(include=['datetime']).columns.tolist()
     
     # Inicializar el DataFrame filtrado
     filtered_df = df.copy()
@@ -80,8 +81,15 @@ def mapa_personalizado(df, base):
         if variable in columnas_texto:
             # Si la columna contiene texto, se seleccionan los valores únicos
             valores_unicos = df[variable].unique()
-            selected_values = st.multiselect(f"Selecciona los valores para {variable}", valores_unicos, default=valores_unicos)
-            filtered_df = filtered_df[filtered_df[variable].isin(selected_values)]
+            selected_values = st.multiselect(f"Selecciona los valores para {variable}", valores_unicos, default=[])
+            if selected_values:  # Filtrar solo si hay valores seleccionados
+                filtered_df = filtered_df[filtered_df[variable].isin(selected_values)]
+        elif variable in columnas_fecha:
+            # Si la columna contiene fechas, se selecciona un rango de fechas
+            min_fecha = pd.to_datetime(df[variable].min())
+            max_fecha = pd.to_datetime(df[variable].max())
+            fecha_inicio, fecha_fin = st.slider(f"Selecciona el rango para {variable}", min_value=min_fecha, max_value=max_fecha, value=(min_fecha, max_fecha))
+            filtered_df = filtered_df[(filtered_df[variable] >= fecha_inicio) & (filtered_df[variable] <= fecha_fin)]
         else:
             # Si la columna contiene valores numéricos, se seleccionan los rangos
             min_val, max_val = st.slider(f"Selecciona el rango para {variable}", float(df[variable].min()), float(df[variable].max()), (float(df[variable].min()), float(df[variable].max())))
@@ -92,7 +100,7 @@ def mapa_personalizado(df, base):
     base.plot(ax=ax, color='white', edgecolor='black')
     filtered_df.plot(ax=ax, column=selected_variables[0], cmap="coolwarm", legend=True, marker='o', markersize=10)
     st.pyplot(fig)
-    st.pyplot(fig)
+
 
 def analisis_cluster(df):
     st.title('Análisis de Clúster de Superficies Deforestadas')
