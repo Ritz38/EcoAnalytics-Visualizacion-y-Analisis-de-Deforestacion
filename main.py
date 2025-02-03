@@ -66,19 +66,32 @@ def mapa_por_precipitacion(df, base):
 def mapa_personalizado(df, base):
     st.title('Mapa Personalizado por Variables Seleccionadas')
     
-    # Recibir las variables y rangos de filtrado
-    variable_1 = st.selectbox("Selecciona la primera variable", df.columns)
-    min_1, max_1 = st.slider(f"Selecciona el rango para {variable_1}", float(df[variable_1].min()), float(df[variable_1].max()), (float(df[variable_1].min()), float(df[variable_1].max())))
+    # Selección de hasta 4 variables
+    variables_disponibles = df.columns.tolist()
+    selected_variables = st.multiselect("Selecciona hasta 4 variables", variables_disponibles, max_selections=4)
     
-    variable_2 = st.selectbox("Selecciona la segunda variable", df.columns)
-    min_2, max_2 = st.slider(f"Selecciona el rango para {variable_2}", float(df[variable_2].min()), float(df[variable_2].max()), (float(df[variable_2].min()), float(df[variable_2].max())))
+    # Filtrar las columnas que contienen texto
+    columnas_texto = df[selected_variables].select_dtypes(include=['object']).columns.tolist()
     
-    filtered_df = df[(df[variable_1] >= min_1) & (df[variable_1] <= max_1) & (df[variable_2] >= min_2) & (df[variable_2] <= max_2)]
+    # Inicializar el DataFrame filtrado
+    filtered_df = df.copy()
+
+    for variable in selected_variables:
+        if variable in columnas_texto:
+            # Si la columna contiene texto, se seleccionan los valores únicos
+            valores_unicos = df[variable].unique()
+            selected_values = st.multiselect(f"Selecciona los valores para {variable}", valores_unicos, default=valores_unicos)
+            filtered_df = filtered_df[filtered_df[variable].isin(selected_values)]
+        else:
+            # Si la columna contiene valores numéricos, se seleccionan los rangos
+            min_val, max_val = st.slider(f"Selecciona el rango para {variable}", float(df[variable].min()), float(df[variable].max()), (float(df[variable].min()), float(df[variable].max())))
+            filtered_df = filtered_df[(filtered_df[variable] >= min_val) & (filtered_df[variable] <= max_val)]
     
     # Crear el gráfico con los datos filtrados
     fig, ax = plt.subplots(1, 1, figsize=(10, 6))
     base.plot(ax=ax, color='white', edgecolor='black')
-    filtered_df.plot(ax=ax, column=variable_1, cmap="coolwarm", legend=True, marker='o', markersize=10)
+    filtered_df.plot(ax=ax, column=selected_variables[0], cmap="coolwarm", legend=True, marker='o', markersize=10)
+    st.pyplot(fig)
     st.pyplot(fig)
 
 def analisis_cluster(df):
