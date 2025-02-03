@@ -44,15 +44,18 @@ def estadisticas_vegetacion(df):
 
 def mapa_por_vegetación():
     st.title('Mapa por vegetacion')
-    df.plot(ax=base, column="Tipo_Vegetacion", cmap="Set2", legend=True, marker='o', markersize=10)
+    fig = df.plot(ax=base, column="Tipo_Vegetacion", cmap="Set2", legend=True, marker='o', markersize=10)
+    st.pyplot(fig)
 
 def mapa_por_altitud():
     st.title('Mapa por altitud')
-    df.plot(ax=base, column="Altitud", cmap="coolwarm", legend=True, marker='o', markersize=10)
+    fig = df.plot(ax=base, column="Altitud", cmap="coolwarm", legend=True, marker='o', markersize=10)
+    st.pyplot(fig)
 
 def mapa_por_precipitacion():
     st.title('Mapa por precipitacion')
-    df.plot(ax=base, column="Precipitacion", cmap="coolwarm", legend=True, marker='o', markersize=10)
+    fig = df.plot(ax=base, column="Precipitacion", cmap="coolwarm", legend=True, marker='o', markersize=10)
+    st.pyplot(fig)
 
 def interaccion_usuario(df):
     ruta_mapa = "https://naturalearth.s3.amazonaws.com/50m_cultural/ne_50m_admin_0_countries.zip"
@@ -71,7 +74,6 @@ def interaccion_usuario(df):
     mapa_por_precipitacion()
 
     # Ajustar el espacio entre subgráficos
-    st.pyplot(fig)
 
 def main():
     # Título de la app
