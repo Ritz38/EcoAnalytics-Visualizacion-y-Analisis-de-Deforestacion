@@ -93,17 +93,29 @@ def mapa_personalizado(df, base):
             min_fecha = pd.to_datetime(df[variable].min())
             max_fecha = pd.to_datetime(df[variable].max())
             fecha_inicio, fecha_fin = st.slider(f"Selecciona el rango para {variable}", min_value=min_fecha, max_value=max_fecha, value=(min_fecha, max_fecha))
-            filtered_df = filtered_df[(filtered_df[variable] >= fecha_inicio) & (filtered_df[variable] <= fecha_fin)]
+            
+            # Validar si el rango seleccionado no está vacío
+            if fecha_inicio != fecha_fin:
+                filtered_df = filtered_df[(filtered_df[variable] >= fecha_inicio) & (filtered_df[variable] <= fecha_fin)]
+            else:
+                st.warning("Por favor, selecciona un rango de fechas válido.")
+                return
         else:
             # Si la columna contiene valores numéricos, se seleccionan los rangos
             min_val, max_val = st.slider(f"Selecciona el rango para {variable}", float(df[variable].min()), float(df[variable].max()), (float(df[variable].min()), float(df[variable].max())))
             filtered_df = filtered_df[(filtered_df[variable] >= min_val) & (filtered_df[variable] <= max_val)]
+    
+    # Verificar si después de los filtros el DataFrame está vacío
+    if filtered_df.empty:
+        st.warning("No se han encontrado datos que coincidan con los filtros seleccionados.")
+        return
     
     # Crear el gráfico con los datos filtrados
     fig, ax = plt.subplots(1, 1, figsize=(10, 6))
     base.plot(ax=ax, color='white', edgecolor='black')
     filtered_df.plot(ax=ax, column=selected_variables[0], cmap="coolwarm", legend=True, marker='o', markersize=10)
     st.pyplot(fig)
+
 
 
 
