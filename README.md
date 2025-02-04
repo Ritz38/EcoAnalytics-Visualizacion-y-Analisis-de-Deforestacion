@@ -4,7 +4,7 @@
 
 **EcoAnalytics** es una herramienta interactiva diseñada para analizar y visualizar datos relacionados con la deforestación en América del Sur. La aplicación permite a los usuarios cargar datos en formato CSV, ya sea subiendo un archivo o proporcionando un enlace, y ofrece una variedad de funcionalidades para explorar y entender los patrones de deforestación en diferentes tipos de vegetación, altitudes y niveles de precipitación.
 
-**CSV SUGERIDO:** https://drive.google.com/file/d/1c4txVXyo40OgT0hSrwplLjlsjUX7rlZs/view?usp=sharing
+**CSV SUGERIDO:** https://raw.githubusercontent.com/Ritz38/EcoAnalytics-Visualizacion-y-Analisis-de-Deforestacion/refs/heads/main/deforestacion.csv
 
 ## Características principales
 
